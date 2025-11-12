@@ -28,12 +28,9 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
 from openpyxl import Workbook
 
-# -------------------- PRINCIPAIS FUNÇÕES -------------------- #
+# --- PRINCIPAIS FUNÇÕES --- #
 
 def carregar_dados(diretorio: str) -> pd.DataFrame:
-    """
-    Vai ler todos os arquivos CSV/Excel no diretório informado e retorna um DataFrame consolidado.
-    """
     arquivos = [f for f in os.listdir(diretorio) if f.endswith(('.csv', '.xlsx'))]
     if not arquivos:
         raise FileNotFoundError("Nenhum arquivo CSV ou Excel encontrado no diretório informado.")
@@ -59,12 +56,8 @@ def carregar_dados(diretorio: str) -> pd.DataFrame:
 
 
 def calcular_metricas(df: pd.DataFrame) -> dict:
-    """
-    Calcula indicadores administrativos e financeiros com base no DataFrame consolidado.
-    """
     metricas = {}
 
-    # Garantir que as colunas esperadas existam
     colunas = df.columns.str.lower()
     if 'receita' in colunas:
         metricas['Receita Total'] = df.loc[:, df.columns[colunas == 'receita'][0]].sum()
@@ -83,9 +76,6 @@ def calcular_metricas(df: pd.DataFrame) -> dict:
 
 
 def gerar_graficos(df: pd.DataFrame, pasta_saida: str):
-    """
-    Gera gráficos interativos com Plotly e salva como HTML.
-    """
     if 'data' in df.columns:
         df['data'] = pd.to_datetime(df['data'], errors='coerce')
         df = df.dropna(subset=['data'])
@@ -103,9 +93,6 @@ def gerar_graficos(df: pd.DataFrame, pasta_saida: str):
 
 
 def exportar_excel(metricas: dict, df: pd.DataFrame, pasta_saida: str):
-    """
-    Exporta os dados consolidados e métricas para um arquivo Excel.
-    """
     caminho_excel = os.path.join(pasta_saida, 'relatorio_administrativo.xlsx')
     with pd.ExcelWriter(caminho_excel, engine='openpyxl') as writer:
         df.to_excel(writer, index=False, sheet_name='Dados Consolidados')
@@ -114,9 +101,6 @@ def exportar_excel(metricas: dict, df: pd.DataFrame, pasta_saida: str):
 
 
 def exportar_pdf(metricas: dict, pasta_saida: str):
-    """
-    Gera um PDF simples com as métricas principais.
-    """
     caminho_pdf = os.path.join(pasta_saida, 'relatorio_administrativo.pdf')
     c = canvas.Canvas(caminho_pdf, pagesize=A4)
     c.setTitle("Relatório Administrativo")
@@ -132,7 +116,7 @@ def exportar_pdf(metricas: dict, pasta_saida: str):
     print(f"[INFO] Relatório PDF salvo em: {caminho_pdf}")
 
 
-# -------------------- FLUXO PRINCIPAL -------------------- #
+# --- FLUXO PRINCIPAL --- #
 
 def main():
     parser = argparse.ArgumentParser(description="Automação de relatórios administrativos")
